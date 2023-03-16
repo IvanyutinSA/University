@@ -9,11 +9,11 @@ void displayArray(Array arr, string name)
 }
 
 
+int[] arr = { 1, 2, 3, 4, 5 };
+int[] extraArray = new int[5];
 while (true)
 {
     Console.WriteLine("Меню.\n");
-    int[] arr = { 1, 2, 3, 4, 5 };
-    int[] extraArray = new int[5];
     Console.WriteLine("1. Binary Search\n2. Clear\n3. Copy\n4. Sort\n5. GetValue\n"
                     + "6. GetLength\n7. GetType\n8. IndexOf\n9. Resize\n10. Reverse");
 

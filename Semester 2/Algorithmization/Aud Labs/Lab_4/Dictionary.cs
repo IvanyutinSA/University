@@ -44,7 +44,7 @@ while (true)
     else if (method == "3")
     {
         Console.WriteLine("Укажите ключ:значение");
-        var pair = Console.ReadLine().Split();
+        var pair = Console.ReadLine().Split(":");
         if (!dict.TryAdd(pair[0], pair[1]))
             Console.WriteLine("Пара с указанным ключом уже существует");
     }

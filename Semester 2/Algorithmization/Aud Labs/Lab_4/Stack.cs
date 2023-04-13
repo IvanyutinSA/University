@@ -82,42 +82,36 @@ while (true)
 
     else if (method == "9")
     {
-        var stackS = new Stack<char>();
-        var stackC = new Stack<char>();
-        var stackF = new Stack<char>();
-        var stacks = new Dictionary <char, List<object>>();
 
-        Console.WriteLine("Введите строку");
-
+        var brackets = new Stack<char>();
+        char[] allBrackets = { '(', '[', '{', '}', ']', ')' };
+        char[] openBrackets = { '(', '[', '{' };
+        var pairBrackets = new Dictionary<char, char>();
+        pairBrackets[')'] = '(';
+        pairBrackets[']'] = '[';
+        pairBrackets['}'] = '{';
         try
         {
             foreach (char symbol in Console.ReadLine())
             {
-                if (symbol == '(')
-                    stackC.Push(symbol);
-                else if (symbol == '[')
-                    stackS.Push(symbol);
-                else if (symbol == '{')
-                    stackF.Push(symbol);
-                else if (symbol == ')')
-                    stackC.Pop();
-                else if (symbol == ']')
-                    stackS.Pop();
-                else if (symbol == '}')
-                    stackS.Pop();
+                if (pairBrackets.ContainsValue(symbol))
+                    brackets.Push(symbol);
+                else if (pairBrackets.ContainsKey(symbol))
+                {
+                    if (brackets.Peek() == pairBrackets[symbol])
+                        brackets.Pop();
+                    else
+                        throw new Exception();
+                }
             }
-
-            if (stackC.Count > 0
-                || stackS.Count > 0
-                || stackF.Count > 0)
-                throw new Exception("Error");
+            if (brackets.Count != 0)
+                throw new Exception();
             Console.WriteLine("Всё окей");
         }
-        catch (Exception e)
+        catch
         {
             Console.WriteLine("Нарушен порядок открытия/закрытия скобок");
         }
-
         Console.ReadKey();
         Console.Clear();
         continue;

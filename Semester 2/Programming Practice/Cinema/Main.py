@@ -1,6 +1,7 @@
 import uuid
 import datetime
 
+
 class CinemaException(Exception):
     def __init__(self, text):
         self.txt = text
@@ -23,6 +24,9 @@ class Host:
             stall.add_session(self, session)
         except CinemaException:
             print('Невозможно добавить данную сессию')
+
+    def get_sessions_list(self):
+        return stall.get_host_sessions(self)
 
     def display_free_halls(self, start_date, end_date):
         self.stall.display_free_halls(self, start_date, end_date)
@@ -74,13 +78,18 @@ class Stall:
     def add_session(self, host, new_session):
         for host_sessions in self.schedule.values():
             for session in host_sessions:
-                if not (session.end < new_session.start or new_session.end < session.start):
+                if not (session.end < new_session.start
+                        or new_session.end < session.start
+                        or new_session.start != session.start):
                     raise CinemaException("AddSessionException")
         if host.id in self.schedule.keys():
             self.schedule[host.id].append(new_session)
         else:
             self.schedule[host.id] = [new_session]
         self.schedule[host.id].sort(key=lambda x: x.start)
+
+    def get_host_sessions(self, host):
+        return self.schedule[host.id]
 
     def remove_session(self, host, session):
         self.schedule[host.id].remove(session)
@@ -196,6 +205,7 @@ hall_2 = Hall('2', seats)
 hall_3 = Hall('3', seats)
 hall_4 = Hall('4', seats)
 hall_5 = Hall('5', seats)
+hall_6 = Hall('6', seats)
 
 # Cinemas
 cinema_1 = Cinema("Коралл", hall_1)
@@ -203,7 +213,7 @@ cinema_1.add_hall(hall_2)
 cinema_1.add_hall(hall_3)
 cinema_1.add_hall(hall_4)
 cinema_2 = Cinema("Октябрь", hall_5)
-cinema_2.add_hall(hall_5)
+cinema_2.add_hall(hall_6)
 
 # Host and Stall
 stall = Stall()
@@ -211,32 +221,30 @@ kaban = Host(cinema_1, stall)
 kaban.add_cinema(cinema_2)
 
 # Sessions
-session_1 = Session("First", datetime.datetime(2023,4,16,18,30), datetime.timedelta(minutes=120), kaban,
+session_1 = Session("Movie", datetime.datetime(2023,3,16,18,30), datetime.timedelta(minutes=120), kaban,
                     cinema_1.name, hall_1.name)
-session_2 = Session("Second", datetime.datetime(2023,4,16,19,30), datetime.timedelta(minutes=130), kaban,
-                    cinema_1.name, hall_1.name)
-session_3 = Session("First", datetime.datetime(2023,4,16,18,30), datetime.timedelta(minutes=110), kaban,
+session_2 = Session("Movie", datetime.datetime(2023,4,16,19,30), datetime.timedelta(minutes=130), kaban,
+                    cinema_1.name, hall_3.name)
+session_3 = Session("Movie", datetime.datetime(2023,4,16,18,30), datetime.timedelta(minutes=110), kaban,
                     cinema_1.name, hall_2.name)
-session_4 = Session("First", datetime.datetime(2023,4,16,10,30), datetime.timedelta(minutes=120), kaban,
+session_4 = Session("Movie", datetime.datetime(2023,4,16,10,30), datetime.timedelta(minutes=120), kaban,
+                    cinema_2.name, hall_6.name)
+session_5 = Session("Movie", datetime.datetime(2023,4,16,13,30), datetime.timedelta(minutes=140), kaban,
                     cinema_2.name, hall_5.name)
-session_5 = Session("First", datetime.datetime(2023,4,16,13,30), datetime.timedelta(minutes=140), kaban,
-                    cinema_2.name, hall_5.name)
-session_6 = Session("First", datetime.datetime(2023,4,16,17,30), datetime.timedelta(minutes=120), kaban,
-                    cinema_1.name, hall_4.name)
+session_6 = Session("Movie", datetime.datetime(2023,4,16,17,30), datetime.timedelta(minutes=120), kaban,
+                    cinema_2.name, hall_6.name)
 
 # Client
 Artur = Client(stall)
 
 kaban.add_session(session_1, stall)
-Artur.display_schedule()
-Artur.display_specified_session('First')
-for i in range(1, 10):
-    for j in range(1, 10):
-        Artur.buy_ticket(session_1, i, j)
-Artur.return_ticket((session_1, (8, 5)))
-Artur.display_specified_session('First')
+kaban.add_session(session_2, stall)
+kaban.add_session(session_3, stall)
+kaban.add_session(session_4, stall)
+kaban.add_session(session_5, stall)
+kaban.add_session(session_6, stall)
 
-Artur.buy_ticket(session_1, 1, 1)
+Artur.buy_ticket(session_6, 3, 4)
 
 def display_cinemas(host):
     i = 1
@@ -247,12 +255,14 @@ def display_cinemas(host):
         i += 1
     return cinemas
 
+
 def display_halls(cinema):
     i = 1
     halls = {}
     for hall_name in cinema.halls.keys():
         print(str(i) + '. ' + hall_name)
         halls[str(i)] = hall_name
+        i+=1
     return halls
 
 
@@ -286,7 +296,7 @@ while True:
             print('Укажите имя кинотеатра')
             kaban.add_cinema(Cinema(input(), new_hall))
 
-        if message == '2':
+        elif message == '2':
             print('Укажите кинотеатр')
             cinemas = display_cinemas(kaban)
             try:
@@ -296,7 +306,7 @@ while True:
                 break
             kaban.remove_cinema(cinema_name)
 
-        if message == '3':
+        elif message == '3':
             print('В какой кинотеатр вы хотите добавить зал?')
             i = 1
             cinemas = display_cinemas(kaban)
@@ -320,7 +330,7 @@ while True:
             new_hall = Hall(input(), seats)
             kaban.cinemas[cinema_name].add_hall(new_hall)
 
-        if message == '4':
+        elif message == '4':
             print('Выберите кинотеатр')
             cinemas = display_cinemas(kaban)
             try:
@@ -336,23 +346,16 @@ while True:
                 print('Такого зала нет!')
                 break
 
-        if message == '5':
+        elif message == '5':
             print('Укажите название фильма')
             name = input()
-            print('Выберите кинотеатр')
-            cinemas = display_cinemas(kaban)
-            try:
-                cinema_name = cinemas[input()]
-            except KeyError:
-                print('Такого кинотеатра нет!')
-                break
             print("Укажите начало фильма yyyy/mm/dd hh:mm")
             message = input().split()
             date = list(map(int, message[0].split('/')))
             time = list(map(int, message[1].split(':')))
             new_date = datetime.datetime(date[0],date[1],date[2], time[0], time[1])
             print('Укажите длительность фильма в минутах')
-            duration = int(input())
+            duration = datetime.timedelta(minutes=int(input()))
 
             print('Укажите кинотеатр')
             cinemas = display_cinemas(kaban)
@@ -379,13 +382,37 @@ while True:
         message = input()
         if message == '1':
             Artur.display_schedule()
-        if message == '2':
+        elif message == '2':
             print('Укажите название фильма')
             name = input()
             print('Сколько свободных мест должно быть рядом?')
             Artur.display_specified_session(name, int(input()))
-        if message == '3':
-            pass
-        if message == '4':
-            pass
+        elif message == '3':
+            print("Выберите интересующий вас сеанс")
+            counter = 1
+            for session in kaban.get_sessions_list():
+                print(str(counter) + '.', session.get_general_information())
+                counter+=1
+            message = int(input())
+            session = kaban.get_sessions_list()[message-1]
+            print("Выберите ряд и место (пример: 3 4):")
+            session.display_seat_configuration()
+            row, seat = map(int, input().split())
+            Artur.buy_ticket(session, row, seat)
+
+        elif message == '4':
+            if not len(Artur.tickets):
+                print("У вас нет билетов!")
+                continue
+            print("Выберите билет, который хотите вернуть:")
+            counter = 1
+            for ticket in Artur.tickets:
+                session = ticket[0]
+                row = ticket[1][0]
+                seat = ticket[1][1]
+                print("{}. movie={}, begin={}, cinema={}, hall={} row={}, seat={}".format(counter, session.name,
+                      session.start, session.cinema_name, session.hall_name, row, seat))
+            message = int(input())
+            Artur.return_ticket(Artur.tickets[message-1])
+
 

@@ -1,54 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Casual;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
+using static Program;
 
-namespace Casual
+internal class Program
 {
-    internal class SomeArray<T>
+    private static void Main(string[] args)
     {
-        private T[] InnerArray { get; init; }
-        public int Size { get; set; }
-        public SomeArray(int size)
-        {
-            InnerArray = new T[size];
-            this.Size = size;
-        }
-        public void SetValueByIndex(int id, T value)
-        {
-            InnerArray[id] = value;
-        }
-        public void DeleteValueByIndex(int id)
-        {
-            InnerArray[id] = default;
-        }
-        public void Remove(T value)
-        {
-            for (int i = 0; i < this.Size; i++)
-            {
-                if (InnerArray[i] == null)
-                    continue;
-                if (InnerArray[i].Equals(value))
-                {
-                    InnerArray[i] = default;
-                    return;
-                }
-            }
-        }
-        public T GetValueByIndex(int id)
-        {
-            return InnerArray[id];
-        }
-        public void Display()
-        {
-            foreach (var item in InnerArray)
-                if (item != null)
-                    Console.Write(item.ToString() + ' ');
-                else
-                    Console.Write("null ");
-            Console.WriteLine();
-        }
+        var arr1 = new SomeArray<int>(5);
+        arr1.SetValueByIndex(0, 23423);
+        arr1.SetValueByIndex(1, 234);
+        arr1.Display();
+        arr1.DeleteValueByIndex(0);
+        arr1.Display();
+        arr1.Remove(234);
+        arr1.Display();
+
+        Console.WriteLine();
+        var arr2 = new SomeArray<string>(5);
+        arr2.SetValueByIndex(0, "sdfds");
+        arr2.SetValueByIndex(1, "asdfasdg");
+        arr2.Display();
+        arr2.DeleteValueByIndex(0);
+        arr2.Display();
+        arr2.Remove("asdfasdg");
+        arr2.Display();
     }
 }

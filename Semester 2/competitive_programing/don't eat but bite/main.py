@@ -1,37 +1,3 @@
-def findway(tree, start, end):
-    startpath = []
-    endpath = []
-    path = 0
-    q = 0
-    if start == [0]:
-        for j in range(len(end) - 1, 0, -1):
-            endpath.append(end[j])
-    for i in range(1, min(len(start), len(end))):
-        if start[i] != end[i]:
-            for j in range(len(start) - 1, i - 1, -1):
-                startpath.append(start[j])
-            for j in range(len(end) - 1, i - 1, -1):
-                endpath.append(end[j])
-            break
-        elif i == len(start) - 1:
-            for j in range(len(end) - 1, i - 1, -1):
-                endpath.append(end[j])
-            break
-        elif i == len(end) - 1:
-            for j in range(len(start) - 1, i - 1, -1):
-                startpath.append(start[j])
-            break
-
-    while (q < max(len(startpath), len(endpath))):
-        if q < len(startpath):
-            path += tree[startpath[q]][0]
-        if q < len(endpath):
-            path += tree[endpath[q]][0]
-        q += 1
-
-    return path
-
-
 def chooseend(tree, start, apples):
     wae = findway(tree, start, apples[0])
     ind = 0
@@ -72,6 +38,40 @@ def chooseapple(start, apples, end):
                         prior = i
                         ind = j
     return apples[ind]
+
+
+def findway(tree, start, end):
+    startpath = []
+    endpath = []
+    path = 0
+    q = 0
+    if start == [0]:
+        for j in range(len(end) - 1, 0, -1):
+            endpath.append(end[j])
+    for i in range(1, min(len(start), len(end))):
+        if start[i] != end[i]:
+            for j in range(len(start) - 1, i - 1, -1):
+                startpath.append(start[j])
+            for j in range(len(end) - 1, i - 1, -1):
+                endpath.append(end[j])
+            break
+        elif i == len(start) - 1:
+            for j in range(len(end) - 1, i - 1, -1):
+                endpath.append(end[j])
+            break
+        elif i == len(end) - 1:
+            for j in range(len(start) - 1, i - 1, -1):
+                startpath.append(start[j])
+            break
+
+    while (q < max(len(startpath), len(endpath))):
+        if q < len(startpath):
+            path += tree[startpath[q]][0]
+        if q < len(endpath):
+            path += tree[endpath[q]][0]
+        q += 1
+
+    return path
 
 
 f = open('input.txt', 'r')
